@@ -1,0 +1,82 @@
+{% extends 'nav/include.html' %}
+
+{% block navbar %}
+    <nav>
+        <div class="nav-wrapper">
+            <div id="nav_bar" class="row">
+                <!-- title -->
+                <div class="col s4">
+                    <a href="#" class="brand-logo">Re-Reddit</a>
+                </div>
+                <!-- search bar -->
+                <div id="search_bar" class="col s4">
+                    <form action="/result/" method="get" id="searchform">
+                        {% csrf_token %}
+                        <div class="input-field">
+                            <input id="search" type="search" name="searchbox" value="{{ request.GET.searchbox }}" required>
+                            <label class="label-icon" for="search"><i class="material-icons">search</i></label>
+                            <i class="material-icons">close</i>
+                        </div>
+                    </form>
+                </div>
+                {% if request.session.is_login %}
+                    <div class="col s4">
+                        <ul id="nav-mobile" class="right hide-on-med-and-down">
+                            <!-- user button -->
+                            <li><a class="dropdown-trigger btn" data-target="dropdown-user">{{ request.session.user_name }}</a></li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <div class="col s4">
+                        <ul id="nav-mobile" class="right hide-on-med-and-down">
+                            <!-- login button -->
+                            <li><a class="waves-effect waves-light modal-trigger" href="#login">LOG IN</a></li>
+                            <!-- signup button -->
+                            <li><a class="waves-effect waves-light btn" href="signup">SIGN UP</a></li>
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    <!-- Popup login Modal Structure -->
+    <div id="login" class="modal">
+        <div class="modal-content">
+            <!-- username -->
+            <div class="row">
+                <form class="col s12 site-form" action="/login/" method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input id="username" name="username" type="text" class="validate">
+                            <label for="username">Username</label>
+                        </div>
+                    </div>
+                    <!-- password -->
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input id="password" name="password" type="password" class="validate">
+                            <label for="password">Password</label>
+                        </div>
+                    </div>
+                    <!-- submit button -->
+                    <div class="row">
+                        <div class="col s12">
+                            <a id="l-forgot" class="waves-effect waves-light btn-flat">forgot password?</a>
+                            <button class="btn waves-effect waves-light right" type="submit" name="action">Submit
+                                <i class="material-icons right">send</i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Dropdown Structure -->
+    <ul id="dropdown-user" class="dropdown-content">
+        <li><a href="#!">one</a></li>
+        <li><a href="#!">two</a></li>
+        <li class="divider" tabindex="-1"></li>
+        <li><a id="user-logout" href="{% url 'app:logout' %}">logout</a></li>
+    </ul>
+{% endblock %}

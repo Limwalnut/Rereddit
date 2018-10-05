@@ -1,0 +1,14 @@
+#nav_bar{
+    height: 100%;
+    margin: 0
+}
+
+#search_bar{
+    height: 100%;
+}
+
+#login{
+    height: 350px;
+    width: 500px;
+    padding: 0;
+}

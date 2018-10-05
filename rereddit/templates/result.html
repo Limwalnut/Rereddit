@@ -1,0 +1,14 @@
+{% extends 'nav/nav_bar.html' %}
+
+{% block content %}
+    <h1>Result</h1>
+    <div class="threads">
+        {% for thread in threads %}
+            <div class="article">
+                <h2><a href="{% url 'app:thread_details' id=thread.id %}">{{ thread.id }}</a></h2>
+                <p>{{ thread.snippet }}</p>
+                <p>{{ thread.date }}</p>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

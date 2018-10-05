@@ -1,0 +1,27 @@
+{% load static from staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Threads</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+    <div class="wrapper">
+        <h1><a href="{% url 'app:threads' %}"><img src="{% static 'logo.png' %}" /></a></h1>
+        <nav>
+            <ul>
+                <li>
+                    <form class="logout-link" action="{% url 'app:logout' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit">Logout</button>
+                    </form>
+                </li>
+            </ul>
+        </nav>
+        {% block content %}
+        {% endblock %}
+    </div>
+</body>
+</html>

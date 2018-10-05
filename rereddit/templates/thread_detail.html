@@ -1,0 +1,11 @@
+{% extends 'base_layout.html' %}
+
+{% block content %}
+<div class="thread-detail">
+    <div class="thread">
+        <h2>{{ thread.title }}</h2>
+        <p>{{ thread.text }}</p>
+        <p>{{ thread.date }}</p>
+    </div>
+</div>
+{% endblock %}
