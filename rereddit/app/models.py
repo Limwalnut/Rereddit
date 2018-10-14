@@ -24,18 +24,28 @@ class File(models.Model):
 # User Profile
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=20, blank=True)
-    last_name = models.CharField(max_length=20, blank=True)
-    username = models.CharField(max_length=20, blank=True)
-    #avatar = models.OneToOneField(File, null=True, blank=True, on_delete=models.SET_NULL)
-    @receiver(post_save, sender=User)
-    def create_user_profile(sender, instance, created, **kwargs):
-        if created:
-            Profile.objects.create(user=instance)
+    first_name = models.CharField(max_length=20, default='')
+    last_name = models.CharField(max_length=20, default='')
+    email = models.CharField(max_length=100, default='')
+    gender = models.CharField(max_length=20, default='')
+    phone = models.IntegerField(default=0)
+    image = models.ImageField(upload_to='media/profile_image', blank=True)
+
+    def __str__(self):
+        return self.user.username
+
+    def create_profile(sender, **kwargs):
+        user = kwargs["instance"]
+        if kwargs["created"]:
+            user_profile = Profile(user=user)
+            user_profile.save()
+
+    post_save.connect(create_profile, sender=User)
 
     @receiver(post_save, sender=User)
     def save_user_profile(sender, instance, **kwargs):
         instance.profile.save()
+
 
 
 class Thread(models.Model):

@@ -1,0 +1,27 @@
+{% extends 'nav/nav_bar.html' %}
+
+{% block content %}
+
+    <div class="card-panel red lighten-2" >
+        <h1>User Profile</h1>
+        <hr>
+    </div>
+    <div id="profile" class="card-panel red lighten-3" >
+        {% if user.profile.image %}
+            <img src="{{ user.profile.image.url }}" width="240">
+        {% else %}
+            <p>111</p>
+        {% endif %}
+
+        <br>
+        <p >User: {{ user.profile.username }}</p>
+        <p >E_mail: {{ user.profile.email }}</p>
+        <p >Gender: {{ user.profile.gender}}</p>
+        <p >First Name: {{ user.profile.first_name }}</p>
+        <p >Last Name: {{ user.profile.last_name }}</p>
+        <p >Phone: {{ user.profile.phone}}</p>
+        <button onclick="location.href='/profile/profile_update'" type="button">Update Profile</button>
+        <button onclick="location.href='/profile/change_password'" type="button">Change Password</button>
+    </div>
+
+{% endblock %}

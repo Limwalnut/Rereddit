@@ -3,8 +3,11 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
-from .models import Thread
+from .models import Thread,Comment
 from . import forms
+from django.contrib.auth.forms import UserChangeForm, PasswordChangeForm
+from .forms import EditProfileForm
+from django.contrib.auth import update_session_auth_hash
 
 # Create your views here.
 
@@ -20,10 +23,10 @@ def signup_view(request):
             user = form.save()
             # Log the user in
             login(request, user)
-            return redirect('/index/')
+
+        return redirect('/index/')
     else:
-        form = UserCreationForm()
-    return render(request, "signup.html", {'form': form})
+        return render(request, "account/signup.html")
 
 
 def login_view(request):
@@ -67,7 +70,17 @@ def thread_list(request):
 
 def thread_detail(request, id):
     thread = Thread.objects.get(id=id)
-    return render(request, 'thread_detail.html', {'thread':thread})
+    comments = Comment.objects.filter(threadID=thread)
+    if request.method == "POST" and "reply_to_thread" in request.POST:
+        print(request.POST['context'])
+        print(request.user.username)
+        comment_object = Comment(
+            author=request.user,
+            threadID=thread,
+            text=request.POST['context']
+        )
+        comment_object.save()
+    return render(request, 'thread_detail.html', {'thread': thread, 'comments': comments})
     #return HttpResponse(title)
 
 
@@ -91,3 +104,58 @@ def search_result(request):
     threads = Thread.objects.filter(title__icontains=content)
     # print(content)
     return render(request, "result.html", {'threads': threads })
+
+
+def profile_view(request):
+    args = {'user':request.user}
+    return render(request, "profile.html",args)
+
+
+@login_required
+def edit_profile(request):
+    user = request.user
+    if request.method == 'POST':
+        # form = EditProfileForm(request.POST, instance= request.user)
+
+        form = EditProfileForm(request.POST, request.FILES, instance=request.user, initial={
+        'gender': user.profile.gender,
+        'first_name':user.profile.first_name,
+        'last_name':user.profile.last_name,
+        'phone':user.profile.phone,
+        'email':user.profile.email,
+        'image':user.profile.image})
+        if form.is_valid():
+            user.profile.gender = request.POST['gender']
+            user.profile.first_name = request.POST['first_name']
+            user.profile.last_name = request.POST['last_name']
+            user.profile.phone = request.POST['phone']
+            user.profile.email = request.POST['email']
+            user.profile.image = request.FILES['image']
+            user.save()
+            form.save()
+            return redirect('/profile')
+
+    else:
+        form = EditProfileForm(instance=request.user)
+        args= {'form':form}
+        return render(request,'profile_update.html',args)
+
+
+@login_required
+def change_passwords(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(data=request.POST, user=request.user)
+
+        if form.is_valid():
+            form.save()
+            update_session_auth_hash(request, form.user)
+            return redirect('/profile')
+        else:
+            return redirect('/change_password')
+
+    else:
+        form = PasswordChangeForm(user = request.user)
+        args = {'form':form}
+        return render(request, 'change_password.html',args)
+
+

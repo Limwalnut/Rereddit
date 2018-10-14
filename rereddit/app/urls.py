@@ -1,6 +1,8 @@
 from django.urls import path
 from django.conf.urls import *
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 
 app_name = 'app'
@@ -15,6 +17,8 @@ urlpatterns = [
     url(r'^threads/$', views.thread_list, name='threads'),
     url(r'^create/$', views.thread_create, name='create'),
     url(r'^result/$', views.search_result, name='result'),
+    url(r'^profile/$', views.profile_view, name='profile'),
+    url(r'^profile/profile_update/$', views.edit_profile, name='edit_profile'),
+    url(r'^profile/change_password/$', views.change_passwords, name='change_passwords'),
     url(r'^(?P<id>[\w-]+)/$', views.thread_detail, name='thread_details'),
-
-]
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

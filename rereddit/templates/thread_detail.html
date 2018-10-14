@@ -1,11 +1,54 @@
-{% extends 'base_layout.html' %}
+{% extends 'nav/nav_bar.html' %}
 
 {% block content %}
-<div class="thread-detail">
-    <div class="thread">
-        <h2>{{ thread.title }}</h2>
-        <p>{{ thread.text }}</p>
-        <p>{{ thread.date }}</p>
+<script>
+var csrftoken = '{% csrf_token %}';
+
+$(function(){
+    $(".red").click(function(){
+                    $(".input-field").remove();
+                    $(this).parent().append("<div class='input-field col s12'>" +
+                        "<form method=\"POST\">" +
+                        csrftoken +
+                        "<div class=\"input-field col s12\">"+
+                        "<textarea id=\"textarea1\" class=\"materialize-textarea\" name=\"context\"></textarea><br/>" +
+                        "<label for=\"textarea1\">Enter your comment here</label>" +
+                        "    <div class=\"col s12\">\n" +
+                        "        <button class=\"btn waves-effect waves-light right\" type=\"submit\" name=\"reply_to_thread\">Submit\n" +
+                        "            <i class=\"material-icons right\">send</i>\n" +
+                        "        </button>\n" +
+                        "    </div>\n" +
+                        "</div>" +
+                        "</form>" +
+                        "</div>");
+                });
+});
+</script>
+
+<br/>
+    <div class="container">
+        <div class="thread-detail">
+            <div class="thread">
+                <h2>{{ thread.title }}</h2>
+                <p>{{ thread.text }}</p>
+                <p>{{ thread.date }}</p>
+                <div>
+                    <a class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">reply</i></a>
+                </div>
+                <br/>
+                <hr />
+
+                {% for comment in comments %}
+                    <p>{{ comment.text }}</p>
+                    <div>
+                        <a class="btn-floating btn-large waves-effect waves-light blue"><i class="material-icons">reply</i></a>
+                    </div>
+                    <hr />
+                {% endfor %}
+            </div>
+        </div>
+
+
+
     </div>
-</div>
 {% endblock %}

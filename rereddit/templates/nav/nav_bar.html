@@ -6,7 +6,7 @@
             <div id="nav_bar" class="row">
                 <!-- title -->
                 <div class="col s4">
-                    <a href="#" class="brand-logo">Re-Reddit</a>
+                    <a href="{% url 'app:index' %}" class="brand-logo">Re-Reddit</a>
                 </div>
                 <!-- search bar -->
                 <div id="search_bar" class="col s4">
@@ -32,7 +32,7 @@
                             <!-- login button -->
                             <li><a class="waves-effect waves-light modal-trigger" href="#login">LOG IN</a></li>
                             <!-- signup button -->
-                            <li><a class="waves-effect waves-light btn" href="signup">SIGN UP</a></li>
+                            <li><a class="waves-effect waves-light btn" href="{% url 'app:signup' %}">SIGN UP</a></li>
                         </ul>
                     </div>
                 {% endif %}
@@ -74,7 +74,7 @@
     </div>
     <!-- Dropdown Structure -->
     <ul id="dropdown-user" class="dropdown-content">
-        <li><a href="#!">one</a></li>
+        <li><a href="{% url 'app:profile' %}">Profile</a></li>
         <li><a href="#!">two</a></li>
         <li class="divider" tabindex="-1"></li>
         <li><a id="user-logout" href="{% url 'app:logout' %}">logout</a></li>
