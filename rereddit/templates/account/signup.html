@@ -2,34 +2,48 @@
 
 {% block content %}
     <div id="signup-form" class="row">
-        <form class="col s12" action="/signup/" method="post">
+        <form class="col s12" action="/signup/" method="post" onsubmit="return on_ginup_submit()">
             {% csrf_token %}
             <div class="row">
                 <div class="input-field col s12">
-                    <input id="username-s" type="text" name="username" class="validate">
+                    <i class="material-icons prefix">account_circle</i>
+                    <input id="username-s" type="text" name="username" class="validate" required minlength="5" maxlength="30">
                     <label for="username-s">User Name</label>
+                    <span class="helper-text" data-error="Your username must contain at least 5 characters" data-success="right"></span>
                 </div>
             </div>
             <div class="row">
                 <div class="input-field col s6">
-                    <input id="first_name" type="text" name="first_name" class="validate">
+                    <input id="first_name" type="text" name="first_name" class="validate" required>
                     <label for="first_name">First Name</label>
+                    <span class="helper-text" data-error="Your first name cannot be empty" data-success="right"></span>
                 </div>
                 <div class="input-field col s6">
-                    <input id="last_name" type="text" name="last_name" class="validate">
+                    <input id="last_name" type="text" name="last_name" class="validate" required>
                     <label for="last_name">Last Name</label>
+                    <span class="helper-text" data-error="Your last name cannot be empty" data-success="right"></span>
                 </div>
             </div>
             <div class="row">
                 <div class="input-field col s12">
-                    <input id="password1" type="password" name="password1" class="validate">
+                    <i class="material-icons prefix">email</i>
+                    <input id="email" type="email" name="email" class="validate" required>
+                    <label for="email">Email</label>
+                    <span class="helper-text" data-error="Your email address must be valid" data-success="right"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <input id="password1" type="password" name="password1" class="validate" required minlength="8">
                     <label for="password1">Password</label>
+                    <span class="helper-text" data-error="Your password must contain at least 8 characters and  can't be entirely numeric" data-success="right"></span>
                 </div>
             </div>
             <div class="row">
                 <div class="input-field col s12">
-                    <input id="password2" type="password" name="password2" class="validate">
+                    <input id="password2" type="password" name="password2" class="validate" minlength="8" required>
                     <label for="password2">Repeat Password</label>
+                    <span class="helper-text" data-error="Your password must contain at least 8 characters and  can't be entirely numeric, the repeat password must be the same to first password" data-success="right"></span>
                 </div>
             </div>
             <!-- submit button -->

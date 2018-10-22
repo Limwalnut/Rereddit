@@ -1,6 +1,14 @@
 {% extends 'nav/nav_bar.html' %}
 
 {% block content %}
+    <style>
+        .CommentL1 {
+            margin-left: 30px;
+        }
+    .CommentL2 {
+            margin-left: 60px;
+        }
+    </style>
 <script>
 var csrftoken = '{% csrf_token %}';
 
@@ -11,6 +19,7 @@ $(function(){
                         "<form method=\"POST\">" +
                         csrftoken +
                         "<div class=\"input-field col s12\">"+
+                        "<i class=\"material-icons prefix\">mode_edit</i>"+
                         "<textarea id=\"textarea1\" class=\"materialize-textarea\" name=\"context\"></textarea><br/>" +
                         "<label for=\"textarea1\">Enter your comment here</label>" +
                         "    <div class=\"col s12\">\n" +
@@ -23,29 +32,354 @@ $(function(){
                         "</div>");
                 });
 });
+
+    function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+    function create_comment(commentId){
+        $(".input-field").remove();
+        var div = document.getElementById(commentId);
+        var newDiv = document.createElement("div");
+        var form = document.createElement("form");
+        var prefix = document.createElement("i");
+        var csrftoken = document.createElement("input");
+        var csrftokenvalue = getCookie('csrftoken');
+        var input = document.createElement("textarea");
+        var inputLable = document.createElement("label");
+        var parentId = document.createElement("input");
+        var button = document.createElement("button");
+
+        newDiv.className="input-field col s12";
+
+        form.method="POST";
+
+        csrftoken.type = "hidden";
+        csrftoken.name = "csrfmiddlewaretoken";
+        csrftoken.value = csrftokenvalue;
+
+        prefix.className = "material-icons prefix";
+        prefix.innerHTML = "mode_edit";
+
+        input.id = "input1";
+        input.name = "context";
+        input.maxLength = "200";
+        input.className = "materialize-textarea";
+
+        inputLable.setAttribute("for","input1");
+        inputLable.innerText = "Reply to this comment";
+
+        parentId.name = "parent";
+        parentId.type = "hidden";
+        parentId.value = commentId;
+
+        button.className = "btn waves-effect waves-light right";
+        button.type = "submit";
+        button.name = "reply_to_comment";
+        button.innerHTML = "Send";
+
+        div.appendChild(newDiv);
+        newDiv.appendChild(form);
+        form.appendChild(csrftoken);
+        form.appendChild(prefix);
+        form.appendChild(input);
+        form.appendChild(inputLable);
+        form.appendChild(parentId);
+        form.appendChild(button);
+    }
+
+    function modify_comment(commentId){
+        $(".input-field").remove();
+        var div = document.getElementById(commentId+"text");
+        var newDiv = document.createElement("div");
+        var form = document.createElement("form");
+        var prefix = document.createElement("i");
+        var csrftoken = document.createElement("input");
+        var csrftokenvalue = getCookie('csrftoken');
+        var input = document.createElement("textarea");
+        var inputLable = document.createElement("label");
+        var commId = document.createElement("input");
+        var button = document.createElement("button");
+
+        newDiv.className="input-field col s12";
+
+        form.method="POST";
+
+        csrftoken.type = "hidden";
+        csrftoken.name = "csrfmiddlewaretoken";
+        csrftoken.value = csrftokenvalue;
+
+        prefix.className = "material-icons prefix";
+        prefix.innerHTML = "mode_edit";
+
+        input.id = "input1";
+        input.name = "context";
+        input.maxLength = "200";
+        input.className = "materialize-textarea";
+        input.value = div.innerHTML;
+
+        inputLable.setAttribute("for","input1");
+        inputLable.innerText = "Edit this comment";
+
+        commId.name = "commId";
+        commId.type = "hidden";
+        commId.value = commentId;
+
+        button.className = "btn waves-effect waves-light right";
+        button.type = "submit";
+        button.name = "edit_comment";
+        button.innerHTML = "Send";
+
+        div.appendChild(newDiv);
+        newDiv.appendChild(form);
+        form.appendChild(csrftoken);
+        form.appendChild(prefix);
+        form.appendChild(input);
+        form.appendChild(inputLable);
+        form.appendChild(commId);
+        form.appendChild(button);
+    }
+
+    function modify_thread(){
+        $(".input-field").remove();
+        var div = document.getElementById("result");
+        var newDiv = document.createElement("div");
+        var form = document.createElement("form");
+        var prefix = document.createElement("i");
+        var csrftoken = document.createElement("input");
+        var csrftokenvalue = getCookie('csrftoken');
+        var input = document.createElement("textarea");
+        var inputLable = document.createElement("label");
+        var button = document.createElement("button");
+
+        newDiv.className="input-field col s12";
+
+        form.method="POST";
+
+        csrftoken.type = "hidden";
+        csrftoken.name = "csrfmiddlewaretoken";
+        csrftoken.value = csrftokenvalue;
+
+        prefix.className = "material-icons prefix";
+        prefix.innerHTML = "mode_edit";
+
+        input.id = "input1";
+        input.name = "context";
+        input.maxLength = "200";
+      //  input.className = "materialize-textarea";
+        input.value = document.getElementById("thread_text").value;
+
+        inputLable.setAttribute("for","input1");
+        inputLable.innerText = "Edit this thread";
+
+        button.className = "btn waves-effect waves-light right";
+        button.type = "submit";
+        button.name = "edit_thread";
+        button.innerHTML = "Send";
+
+        div.appendChild(newDiv);
+        newDiv.appendChild(form);
+        form.appendChild(csrftoken);
+        form.appendChild(prefix);
+        form.appendChild(input);
+        form.appendChild(inputLable);
+        form.appendChild(button);
+    }
+
+    window.onload = function createTagLinks(){
+        console.log("adding hypertext!")
+        var title = document.getElementById("thread_text").value;
+        var split = title.split('');
+        var i;
+        var str = '';
+        var new_title = '';
+        for (i=0 ; i<split.length; i++){
+            if (split[i]=='#'){
+                str += split[i];
+                i++;
+                while (i<split.length && split[i]!=' ' && split[i]!='#') {
+                    str += split[i];
+                    i++;
+                }
+                i--;
+                console.log(str);
+                new_title += '<a href="/search/tags/' + str.substring(1, str.length) + '/">'+ str +'</a>';
+                str = '';
+            } else {
+                new_title += split[i];
+            }
+        }
+        document.getElementById("result").innerHTML = new_title;
+    }
+
+    function delete_comment(commentId){
+        $.ajax({
+            type: "POST",
+            name: "delete_comment",
+            data: {
+                "commentID": commentId,
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+            },
+        success: function(data){
+            console.log("success");
+            console.log(data);
+        },
+        failure: function(data){
+            console.log("failure");
+            console.log(data);
+        },
+});
+
+    }
 </script>
 
 <br/>
     <div class="container">
+
         <div class="thread-detail">
+
+        {% if thisUser == thread.author %}
+
             <div class="thread">
-                <h2>{{ thread.title }}</h2>
-                <p>{{ thread.text }}</p>
-                <p>{{ thread.date }}</p>
-                <div>
-                    <a class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">reply</i></a>
+                <div class="row">
+                    <div class="col s11">
+                        <h2>{{ thread.title }}</h2>
+                    </div>
+                    <div class="col s1">
+                        <a href="javascript:modify_thread()" style="color:#0000FF;">Edit</a>
+                    </div>
                 </div>
+                <input type="hidden" id="thread_text" name="variable" value="{{ thread.text }}">
+                <input type="hidden" id="thread_tags" name="variable" value="{{ thread.tags }}">
+                <input type="hidden" id="tag_function" name="variable" onload="createTagLinks()">
+                <p id="result"></p>
+                <p>{{ thread.date }}</p>
                 <br/>
+                <a href="{% url 'app:file_download' id=thread.id %}">{{ file.name }}</a>
                 <hr />
 
-                {% for comment in comments %}
-                    <p>{{ comment.text }}</p>
-                    <div>
-                        <a class="btn-floating btn-large waves-effect waves-light blue"><i class="material-icons">reply</i></a>
+                {% for comment in commentsToThread %}
+                    <div class="row">
+                        <div class="col s1">
+                            <a href="{% url 'app:profile' id=comment.author.id%}">
+                                <img id="portraitMedium" src="{{ comment.author.image.url }}" >
+                            </a>
+                        </div>
+                        <div class="col s5">
+                            <a href="{% url 'app:profile' id=comment.author.id%}">{{ comment.author.user.username }}</a> wrote at
+                            <p>{{ comment.comment_time }}</p>
+                        </div>
+                        <div class="col s1 offset-s5">
+                            {% if thisUser == comment.author.user %}
+                                <a href="javascript:modify_comment('{{ comment.id }}')" style="color:#0000FF;">Edit</a>
+                            {% endif %}
+                            <a href="javascript:delete_comment('{{ comment.id }}')" style="color:#FF0000;" onclick="M.toast({html: 'Deleting comment!'})">Delete</a>
+                        </div>
                     </div>
-                    <hr />
+
+                        <p class="CommentL1" id="{{ comment.id }}text">{{ comment.text }}</p>
+                            {% for innerComment in commentsToComment %}
+                                {% if innerComment.parentCommentID.id == comment.id %}
+                                    <div class="row CommentL2">
+                                    <div class="col s11">
+                                        <p>{{ innerComment.text }}</p>
+                                    </div>
+                                    <div class="col s1">
+                                        <a href="javascript:delete_comment('{{ innerComment.id }}')" style="color:#FF0000;" onclick="M.toast({html: 'Deleting comment!'})">Delete</a>
+                                    </div>
+                                    </div>
+                                    <hr class="CommentL2"/>
+                                {% endif %}
+                            {% endfor %}
+                        <div>
+                            <a class="btn-floating btn-large waves-effect waves-light blue CommentL1" onclick="create_comment('{{ comment.id }}')"><i class="material-icons">add</i></a>
+                            <p id="{{ comment.id }}" class="CommentL1"></p>
+                            <br/>
+                        </div>
+                        <hr class="CommentL1"/>
+
                 {% endfor %}
+                <div>
+                    <a class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">add</i></a>
+                </div>
+                <br/><br/><br/><br/><br/><br/><br/><br/>
             </div>
+
+        {% else %} {# This is someone else's thread #}
+            <div class="thread">
+                <h2>{{ thread.title }}</h2>
+                <input type="hidden" id="thread_text" name="variable" value="{{ thread.text }}">
+                <input type="hidden" id="thread_tags" name="variable" value="{{ thread.tags }}">
+                <input type="hidden" id="tag_function" name="variable" onload="createTagLinks()">
+                <p id="result"></p>
+                <p>{{ thread.date }}</p>
+                <br/>
+                <a href="{% url 'app:file_download' id=thread.id %}">{{ file.name }}</a>
+                <hr />
+
+                {% for comment in commentsToThread %}
+                    <div class="row">
+                        <div class="col s1">
+                            <a href="{% url 'app:profile' id=comment.author.id%}">
+                                <img id="portraitMedium" src="{{ comment.author.image.url }}" >
+                            </a>
+                        </div>
+                        <div class="col s5">
+                            <a href="{% url 'app:profile' id=comment.author.id%}">{{ comment.author.user.username }}</a> wrote at
+                            <p>{{ comment.comment_time }}</p>
+                        </div>
+                        {% if thisUser == comment.author.user %}
+                            <div class="col s1 offset-s5">
+                                <a href="javascript:modify_comment('{{ comment.id }}')" style="color:#0000FF;">Edit</a>
+                                <a href="javascript:delete_comment('{{ comment.id }}')" style="color:#FF0000;" onclick="M.toast({html: 'Deleting comment!'})">Delete</a>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                        <p class="CommentL1" id="{{ comment.id }}text">{{ comment.text }}</p>
+                            {% for innerComment in commentsToComment %}
+                                {% if innerComment.parentCommentID.id == comment.id %}
+                                    <div class="row CommentL2">
+                                    <div class="col s11">
+                                        <p>{{ innerComment.text }}</p>
+                                    </div>
+                                    {% if thisUser == innerComment.author.user %}
+                                        <div class="col s1">
+                                            <a href="javascript:delete_comment('{{ innerComment.id }}')" style="color:#FF0000;" onclick="M.toast({html: 'Deleting comment!'})">Delete</a>
+                                        </div>
+                                    {% endif %}
+                                    </div>
+                                    <hr class="CommentL2"/>
+                                {% endif %}
+                            {% endfor %}
+                        <div>
+                            <a class="btn-floating btn-large waves-effect waves-light blue CommentL1" onclick="create_comment('{{ comment.id }}');return false;"><i class="material-icons">add</i></a>
+                            <p id="{{ comment.id }}" class="CommentL1"></p>
+                            <br/>
+                        </div>
+                        <hr class="CommentL1"/>
+
+                {% endfor %}
+                <div>
+                    <a class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">add</i></a>
+                </div>
+            <br/><br/><br/><br/><br/><br/><br/><br/>
+            </div>
+
+        {% endif %}
+
         </div>
 
 

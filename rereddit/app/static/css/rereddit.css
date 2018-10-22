@@ -1,3 +1,66 @@
+html,body{
+    height: 100%;
+}
+
+/************************************dark mode**********************************************************/
+
+body.dark-mode{
+    background-color: #212121;
+}
+
+body.dark-mode nav{
+    background-color: black;
+}
+
+body.dark-mode h6{
+    color: #9e9e9e;
+}
+body.dark-mode a{
+    color: #9e9e9e;
+}
+body.dark-mode label{
+    color: #9e9e9e;
+}
+
+body.dark-mode .btn{
+    color: #9e9e9e;
+    background-color: #424242;
+}
+body.dark-mode .btn:hover{
+    background-color: #616161;
+}
+body.dark-mode .btn:focus{
+    background-color: #757575;
+}
+
+
+body.dark-mode #dark-switch lever:after{
+    background-color: #ef6c00;
+}
+body.dark-mode  #dark-switch lever:hover{
+    background-color: #f57c00;
+}
+body.dark-mode  #dark-switch lever:focus{
+    background-color: #fb8c00;
+}
+body.dark-mode  #dark-switch lever:active{
+    background-color: #fb8c00;
+}
+
+/* label color */
+body.dark-mode #dark-switch span {
+    background-color: #212121;
+}
+
+body.dark-mode #dark-switch span:after {
+    background-color: #9e9e9e;
+}
+
+/************************************light mode**********************************************************/
+body.light-mode #dark-switch label{
+    color: white;
+}
+
 #nav_bar{
     height: 100%;
     margin: 0
@@ -7,15 +70,79 @@
     height: 100%;
 }
 
-#login{
-    height: 350px;
+#login-modal{
+    height: auto;
     width: 500px;
     padding: 0;
 }
 
+#l-forgot{
+    padding: 0px;
+}
+
 #signup-form{
-    margin-top: 30px;
+    margin-top: 100px;
     margin-left: auto;
     margin-right: auto;
     width: 1000px;
+}
+
+#login-alert{
+    display: none;
+}
+
+#login-alert .col{
+    padding: 0px;
+}
+
+#err-icon{
+    margin: auto;
+    width: 500px;
+}
+
+#err-msg{
+    text-align: center;
+    margin: auto;
+    width: 500px;
+}
+
+#progress{
+    margin: 0px;
+    bottom: 0px;
+    position: absolute;
+}
+
+#portrait{
+    width:45px;
+    height:45px;
+    border-radius:100%;
+}
+
+#portraitMedium{
+    width:60px;
+    height:60px;
+    border-radius:100%;
+}
+
+#portraitBig{
+    width:100px;
+    height:100px;
+    border-radius:100%;
+}
+
+#portrait-container{
+    width: 55px;
+    height: 55px;
+    padding: 5px;
+    border-radius:100%;
+}
+
+#dark-switch{
+    margin-right: 5px;
+    margin-left: 5px;
+}
+
+#profile-text{
+    font-size:20px;
+    font-family: Cambria;
 }

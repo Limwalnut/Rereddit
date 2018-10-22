@@ -4,12 +4,15 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 import uuid
+from PIL import Image
 
 
 # Tags
 class Tag(models.Model):
     name = models.CharField(max_length=20)
 
+    def __str__(self):
+        return self.name
 
 # files
 class File(models.Model):
@@ -24,28 +27,43 @@ class File(models.Model):
 # User Profile
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=20, default='')
-    last_name = models.CharField(max_length=20, default='')
-    email = models.CharField(max_length=100, default='')
-    gender = models.CharField(max_length=20, default='')
+    GENDER_CHOICES = (('Male', 'Male'), ('Female', 'Female'), ('Unisex', 'Unisex/Parody'))
+    gender = models.CharField(max_length=20, choices = GENDER_CHOICES, null = True)
+    # gender = models.CharField(max_length = 20, null = True)
     phone = models.IntegerField(default=0)
-    image = models.ImageField(upload_to='media/profile_image', blank=True)
+    birthday = models.DateField( blank=True, null = True)
+    image = models.ImageField(upload_to='media/profile_image', blank=True, default = 'media/profile_image/779d213e8b3d36e45f97e23a9eafb478.png')
+
 
     def __str__(self):
         return self.user.username
 
-    def create_profile(sender, **kwargs):
-        user = kwargs["instance"]
-        if kwargs["created"]:
-            user_profile = Profile(user=user)
-            user_profile.save()
-
-    post_save.connect(create_profile, sender=User)
+    @receiver(post_save, sender=User)
+    def create_user_profile(sender, instance, created, **kwargs):
+        if created:
+            Profile.objects.create(user=instance)
 
     @receiver(post_save, sender=User)
     def save_user_profile(sender, instance, **kwargs):
         instance.profile.save()
 
+class FollowTag(models.Model):
+    tag = models.ManyToManyField(Tag, related_name = 'tag_set',null = True)
+    current_user = models.ForeignKey(User, related_name = 'owner', null = True,on_delete=models.CASCADE)
+
+    @classmethod
+    def subscribe_tag(cls, current_user, new_tag):
+        following_tag, created = cls.objects.get_or_create(
+            current_user = current_user
+        )
+        following_tag.tag.add(new_tag)
+
+    @classmethod
+    def unsubscribe_tag(cls, current_user, new_tag):
+        following_tag, created = cls.objects.get_or_create(
+            current_user = current_user
+        )
+        following_tag.tag.remove(new_tag)
 
 
 class Thread(models.Model):
@@ -54,6 +72,7 @@ class Thread(models.Model):
     text = models.TextField()
     created_date = models.DateTimeField(
             default=timezone.now)
+    tags = models.ManyToManyField(Tag)
 
     def __str__(self):
         return self.title
@@ -75,11 +94,11 @@ class ThreadTag(models.Model):
 
 
 class Comment(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(Profile, on_delete=models.CASCADE)
     threadID = models.ForeignKey(Thread, on_delete=models.CASCADE)
     comment_time = models.DateTimeField(
             default=timezone.now)
-    parentCommentID = models.OneToOneField('self', null=True, blank=True, on_delete=models.SET_NULL)
+    parentCommentID = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
     text = models.TextField()
 
 

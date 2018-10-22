@@ -1,0 +1,25 @@
+{% extends 'nav/nav_bar.html' %}
+
+{% block content %}
+    <script>
+        setTimeout(function() {
+            window.location='/index/'
+        }, 3000);
+    </script>
+    <div class="row">
+        <div id="err-icon" class="row">
+            <img src="\static\icon\icons8-box-important-512.png" />
+        </div>
+        <!-- error info -->
+        <div id="err-msg" class="row">
+            <div class="input-field col s12">
+                <span class="red-text text-darken-2 flow-text">
+                    {{ err_msg }}
+                </span>
+            </div>
+        </div>
+    </div>
+    <div id="progress" class="progress">
+        <div class="indeterminate"></div>
+    </div>
+{% endblock %}

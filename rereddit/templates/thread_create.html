@@ -1,13 +1,41 @@
-{% extends 'base_layout.html' %}
+{% extends 'nav/nav_bar.html' %}
 
 {% block content %}
-    <div class="create-thread">
-        <h2>Create an Awesome New Thread</h2>
-        <form class = "site-form" action='/create/' method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form }}
-            <input type="submit" value="Create">
-        </form>
-    </div>
 
+<script type>
+function validateForm() {
+    var title = document.forms["create_thread"]["title"].value;
+    if (title == "") {
+        alert("Name must be filled out");
+        return false;
+    }
+    var text = document.forms["create_thread"]["text"].value;
+    var hash = text.indexOf("#");
+    if (hash == -1) {
+        alert("Need a tag for the thread");
+        return false;
+    }
+}
+</script>
+    <div class="container">
+        <div class="create-thread">
+            <h2>Create an Awesome New Thread</h2>
+            <form name = "create_thread" class = "site-form" action='/create/' onsubmit="return validateForm()" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form }}
+
+                <div class="file-field input-field">
+                    <div class="btn">
+                        <span>File</span>
+                        <input type="file" name="myfile">
+                    </div>
+                    <div class="file-path-wrapper">
+                        <input class="file-path validate" type="text">
+                    </div>
+                </div>
+
+                <input type="submit" value="Submit">
+            </form>
+        </div>
+    </div>
 {% endblock %}

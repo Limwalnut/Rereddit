@@ -1,27 +1,49 @@
 {% extends 'nav/nav_bar.html' %}
 
 {% block content %}
-
-    <div class="card-panel red lighten-2" >
-        <h1>User Profile</h1>
-        <hr>
+    <script>
+        $(document).ready(function(){
+        $('.parallax').parallax();});
+    </script>
+    <br>
+    <div class="parallax-container">
+      <div class="parallax"><img src="\static\image\Parallax5.jpg" width="1500px"></div>
     </div>
-    <div id="profile" class="card-panel red lighten-3" >
-        {% if user.profile.image %}
-            <img src="{{ user.profile.image.url }}" width="240">
+{#    <div class="section white">#}
+      <div class="row container">
+      <div class="container">
+      <h2 class="center-align">Profile</h2>
+      <div class="center-align">
+          {% if user.profile.image %}
+            <img  id="portraitBig" src="{{ user.profile.image.url }}">
         {% else %}
-            <p>111</p>
+            <img  id="portraitBig" src="\static\icon\test-portrait.png">
         {% endif %}
-
         <br>
-        <p >User: {{ user.profile.username }}</p>
-        <p >E_mail: {{ user.profile.email }}</p>
-        <p >Gender: {{ user.profile.gender}}</p>
-        <p >First Name: {{ user.profile.first_name }}</p>
-        <p >Last Name: {{ user.profile.last_name }}</p>
-        <p >Phone: {{ user.profile.phone}}</p>
-        <button onclick="location.href='/profile/profile_update'" type="button">Update Profile</button>
-        <button onclick="location.href='/profile/change_password'" type="button">Change Password</button>
+      </div>
+
+        <div id="profile-text" class="center-align">
+            <p class="center-align" id="profile-text">User: {{ user.username }}</p>
+        <p class="center-align">E-mail: {{ user.email }}</p>
+        <p class="center-align">First Name: {{ user.first_name }}</p>
+        <p class="center-align">Last Name: {{ user.last_name }}</p>
+        <p class="center-align">Gender: {{ user.profile.gender}}</p>
+        <p class="center-align">Birthday: {{ user.profile.birthday }}</p>
+        <p class="center-align">Phone: {{ user.profile.phone}}</p>
+        </div>
+      <div class="center-align">
+        {% if thisUser.username == user.username %}
+          <a class="waves-effect waves-light btn" onclick="location.href='{% url 'app:edit_profile' id=user.id %}'">Update</a>
+          <a class="waves-effect waves-light btn" onclick="location.href='{% url 'app:change_password' id=user.id%}'">Change Password</a>
+        {% endif %}
+      </div>
+
+      </div>
     </div>
+{#    </div>#}
+    <div class="parallax-container">
+      <div class="parallax"><img src="\static\image\Parallax6.jpg" width="1500px"></div>
+    </div>
+
 
 {% endblock %}
