@@ -48,7 +48,7 @@ class Profile(models.Model):
         instance.profile.save()
 
 class FollowTag(models.Model):
-    tag = models.ManyToManyField(Tag, related_name = 'tag_set',null = True)
+    tag = models.ManyToManyField(Tag, related_name = 'tag_set', null=True)
     current_user = models.ForeignKey(User, related_name = 'owner', null = True,on_delete=models.CASCADE)
 
     @classmethod
@@ -65,6 +65,23 @@ class FollowTag(models.Model):
         )
         following_tag.tag.remove(new_tag)
 
+class Friends(models.Model):
+    friend = models.ManyToManyField(User, related_name="friend_set")
+    current_user = models.ForeignKey(User, related_name='friend_owner', null=True, on_delete=models.CASCADE)
+
+    @classmethod
+    def subscribe_friend(cls, current_user, new_friend):
+        following_friend, created = cls.objects.get_or_create(
+            current_user=current_user
+        )
+        following_friend.friend.add(new_friend)
+
+    @classmethod
+    def unsubscribe_friend(cls, current_user, new_friend):
+        following_friend, created = cls.objects.get_or_create(
+            current_user=current_user
+        )
+        following_friend.friend.remove(new_friend)
 
 class Thread(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -100,12 +117,7 @@ class Comment(models.Model):
             default=timezone.now)
     parentCommentID = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
     text = models.TextField()
-
-
-# Comment Files
-class CommentFile(models.Model):
-    commentId = models.ForeignKey(Comment, on_delete=models.CASCADE)
-    fileId = models.ForeignKey(File, on_delete=models.CASCADE)
+    tags = models.ManyToManyField(Tag)
 
 
 # Comment Tags

@@ -1,0 +1,63 @@
+{% extends 'nav/nav_bar.html' %}
+
+{% block content %}
+    <script>
+        $(document).ready(function(){
+        $('.parallax').parallax();});
+    </script>
+    <div class="parallax-container">
+      <div class="parallax"><img src="\static\image\Parallax5.jpg" width="1500px"></div>
+    </div>
+      <div class="row container">
+      <div class="container">
+      <h2 class="center-align">Profile</h2>
+      <div class="center-align">
+          {% if user.profile.image %}
+            <img  id="portraitBig" src="{{ user.profile.image.url }}">
+        {% else %}
+            <img  id="portraitBig" src="\static\icon\test-portrait.png">
+        {% endif %}
+        <br>
+      </div>
+
+        <div id="profile-text" class="center-align">
+            <p class="center-align" id="profile-text">User: {{ user.username }}</p>
+        <p class="center-align">E-mail: {{ user.email }}</p>
+        <p class="center-align">First Name: {{ user.first_name }}</p>
+        <p class="center-align">Last Name: {{ user.last_name }}</p>
+        <p class="center-align">Gender: {{ user.profile.gender}}</p>
+        <p class="center-align">Birthday: {{ user.profile.birthday }}</p>
+        <p class="center-align">Phone: {{ user.profile.phone}}</p>
+        </div>
+      <div class="center-align">
+        {% if thisUser.username == user.username %}
+          <a class="waves-effect waves-light btn" onclick="location.href='{% url 'app:edit_profile' id=user.id %}'">Update</a>
+          <a class="waves-effect waves-light btn" onclick="location.href='{% url 'app:change_password' id=user.id%}'">Change Password</a>
+
+            {% else %}
+            {% if request.user.is_authenticated %}
+        {% if user in friend %}
+            <a href="{% url 'app:follow_friend' operation='remove' id=user.id %}">
+                  <button class="btn waves-effect waves-light  red lighten-1">Unsubscribe</button>
+                </a>
+            {% else %}
+            <a href="{% url 'app:follow_friend' operation='add' id=user.id %}">
+                <button class="btn waves-effect waves-light">Subscribe</button>
+                </a>
+        {% endif %}
+        {% endif %}
+        {% endif %}
+
+
+
+
+
+      </div>
+      </div>
+    </div>
+    <div class="parallax-container">
+      <div class="parallax"><img src="\static\image\Parallax6.jpg" width="1500px"></div>
+    </div>
+
+
+{% endblock %}

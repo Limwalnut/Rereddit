@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
-from .models import Thread, Comment, User, Profile, Tag, FollowTag, File, ThreadFile
+from .models import Thread, Comment, User, Profile, Tag, FollowTag, File, ThreadFile,Friends
 from . import forms
 from .forms import EditProfileForm, UserCreateForm, UserForm
 from django.contrib.auth import update_session_auth_hash
@@ -12,7 +12,7 @@ from django.views.generic import TemplateView
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import StreamingHttpResponse
 from django.views.decorators.csrf import csrf_exempt
-
+from django.http import HttpResponse
 
 # Create your views here.
 
@@ -104,6 +104,31 @@ def thread_detail(request, id):
     commentsToThread = Comment.objects.filter(threadID=thread,parentCommentID=None)
     commentsToComment = Comment.objects.filter(threadID=thread, parentCommentID__isnull=False)
     thisUser = request.user
+
+    anonymous = False
+    # check if thread is anonymous
+    anon_tags = thread.tags.filter(name='#anonymous')
+
+
+    if len(anon_tags) > 0:
+        anonymous = True
+        anonymous_user = Profile.objects.filter(user__username='Anonymous')
+
+        # for the thread if the author
+        # need to change the model for thread to Profile
+
+
+        # comment author not equal to this user
+        for i in commentsToThread:
+            # if the author is not this user direct to anonymouse
+            if i.author != Profile.objects.filter(user__username=thisUser.username):
+                i.author = anonymous_user[0]
+
+        for i in commentsToComment:
+            # if the author is not this user direct to anonymouse
+            if i.author != Profile.objects.filter(user__username=thisUser.username):
+                i.author = anonymous_user[0]
+
     if request.method == "POST" and "reply_to_thread" in request.POST:
         print(request.POST['context'])
         print(request.user.username)
@@ -113,6 +138,28 @@ def thread_detail(request, id):
             text=request.POST['context']
         )
         comment_object.save()
+
+        # add hash tags if any
+        # get tags
+        hash_tags = []
+        # add code to check for '#'
+        text = request.POST['context']
+        for i in text.split():
+            if i[0] == '#':
+                # append tag to an array
+                hash_tags.append(i)
+
+        for i in hash_tags:
+            # find if tag exists
+            t = Tag.objects.filter(name=i)
+            if len(t) > 0:
+                comment_object.tags.add(t.get())
+            else:
+                # add tag
+                new_t = Tag(name=i)
+                new_t.save()
+                comment_object.tags.add(new_t)
+        return redirect('/thread/'+str(thread.id)+'/redirect/')
     elif request.method == "POST" and "reply_to_comment" in request.POST:
         print(request.POST['context'])
         print(request.POST['parent'])
@@ -124,6 +171,28 @@ def thread_detail(request, id):
             text=request.POST['context']
         )
         comment_object.save()
+
+        # add hash tags if any
+        # get tags
+        hash_tags = []
+        # add code to check for '#'
+        text = request.POST['context']
+        for i in text.split():
+            if i[0] == '#':
+                # append tag to an array
+                hash_tags.append(i)
+
+        for i in hash_tags:
+            # find if tag exists
+            t = Tag.objects.filter(name=i)
+            if len(t) > 0:
+                comment_object.tags.add(t.get())
+            else:
+                # add tag
+                new_t = Tag(name=i)
+                new_t.save()
+                comment_object.tags.add(new_t)
+        return redirect('/thread/' + str(thread.id) + '/redirect/')
     elif request.method == "POST" and "edit_comment" in request.POST:
         print("Editing a comment")
         print(request.POST['context'])
@@ -131,6 +200,27 @@ def thread_detail(request, id):
         comment = Comment.objects.get(id=request.POST['commId'])
         comment.text = request.POST['context']
         comment.save()
+        # add hash tags if any
+        # get tags
+        hash_tags = []
+        # add code to check for '#'
+        text = request.POST['context']
+        for i in text.split():
+            if i[0] == '#':
+                # append tag to an array
+                hash_tags.append(i)
+
+        for i in hash_tags:
+            # find if tag exists
+            t = Tag.objects.filter(name=i)
+            if len(t) > 0:
+                comment_object.tags.add(t.get())
+            else:
+                # add tag
+                new_t = Tag(name=i)
+                new_t.save()
+                comment_object.tags.add(new_t)
+        return redirect('/thread/' + str(thread.id) + '/redirect/')
     elif request.method == "POST" and "edit_thread" in request.POST:
         print("Editing a thread")
         text = request.POST['context']
@@ -166,6 +256,7 @@ def thread_detail(request, id):
                    'file': file,
                    'thisUser': thisUser})
     #return HttpResponse(title)
+
 
 def file_download(request, id):
     threadfile = ThreadFile.objects.get(threadId=id)
@@ -256,8 +347,12 @@ def search_result(request):
                               {'err_msg': 'This tag has not been created!'})
 
         except ObjectDoesNotExist:
-            search_tag = Tag.objects.get(name="#" + content)
-            return render(request, "result.html",{'threads': threads, 'search_tag': search_tag})
+            try:
+                search_tag = Tag.objects.get(name="#" +content)
+                return render(request, "result.html",{'threads': threads, 'search_tag': search_tag})
+            except ObjectDoesNotExist:
+                return render(request, 'account/error_info.html',
+                              {'err_msg': 'This tag has not been created!'})
     else:
         return render(request, "result.html", {'threads': threads})
 
@@ -266,8 +361,21 @@ def search_result(request):
 def profile_view(request, id):
     # args = {'user':request.user}
     thisUser = request.user
-    args = {'user': User.objects.get(id=id),'thisUser':thisUser}
-    return render(request, "profile.html",args)
+    user = User.objects.get(id=id)
+    # args = {'user': User.objects.get(id=id),'thisUser':thisUser}
+    # return render(request, "account/profile.html",args)
+
+    if request.user.is_authenticated:
+        try:
+            friends = Friends.objects.get(current_user=request.user)
+            friend = friends.friend.all()
+            return render(request, "account/profile.html", {'friends': friends, 'friend': friend,'thisUser':thisUser,'user':user})
+        except ObjectDoesNotExist:
+            friends = None
+            return render(request, "account/profile.html", {'friends': friends,'thisUser':thisUser,'user':user})
+
+    else:
+        return render(request, "account/profile.html",{'thisUser':thisUser,'user':user})
 
 
 @login_required
@@ -289,7 +397,7 @@ def edit_profile(request, id):
         profile_object = Profile.objects.get(user=user_object)
         user_form = UserForm(instance = user_object)
         profile_form = EditProfileForm(instance=profile_object)
-        return render(request,'profile_update.html',{
+        return render(request,'account/profile_update.html',{
             'user_form':user_form,
             'profile_form': profile_form
         })
@@ -299,7 +407,6 @@ def edit_profile(request, id):
 @login_required
 def change_passwords(request, id):
     if request.method == 'POST':
-        # user_object = User.objects.get(pk=id)
         form = PasswordChangeForm(data=request.POST, user=request.user )
 
         if form.is_valid():
@@ -310,10 +417,9 @@ def change_passwords(request, id):
             return redirect('/profile/'+id+'/change_password/')
 
     else:
-        # user_object = User.objects.get(pk=id)
         form = PasswordChangeForm(user=request.user)
         args = {'form':form}
-        return render(request, 'change_password.html',args)
+        return render(request, 'account/change_password.html',args)
 
 
 def search_tag(request,name):
@@ -341,3 +447,34 @@ def subscribeTags(request, operation, id):
     else:
         FollowTag.unsubscribe_tag(request.user, new_tag)
     return  redirect('/index/')
+
+def redirectPage(request, id):
+    # return redirect('/'+id+'/')
+    return render(request, "redirect.html", {'threadID': id})
+
+def friend_list(request):
+    # friends = Friends.objects.get(current_user = request.user)
+    if request.user.is_authenticated:
+        try:
+            friends = Friends.objects.get(current_user=request.user)
+            friend = friends.friend.all()
+            return render(request, "account/friend_list.html", {'friends': friends,'friend':friend})
+        except ObjectDoesNotExist:
+            friends = None
+            return render(request, "account/friend_list.html", {'friends': friends})
+
+    else:
+        return render(request, "account/friend_list.html")
+
+def follow_friend(request, operation, id):
+    new_friend = User.objects.get(id=id)
+    if operation == 'add':
+        Friends.subscribe_friend(request.user, new_friend)
+    else:
+        Friends.unsubscribe_friend(request.user, new_friend)
+    return redirect('/friend_list/')
+
+
+
+
+

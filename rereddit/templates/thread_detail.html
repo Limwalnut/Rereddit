@@ -198,6 +198,18 @@ $(function(){
         form.appendChild(button);
     }
 
+    function escapeHTML (unsafe_str) {
+    return unsafe_str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/\"/g, '&quot;')
+      .replace(/\'/g, '&#39;')
+      .replace(/\//g, '&#x2F;')
+    }
+
+
+
     window.onload = function createTagLinks(){
         console.log("adding hypertext!")
         var title = document.getElementById("thread_text").value;
@@ -224,6 +236,7 @@ $(function(){
         document.getElementById("result").innerHTML = new_title;
     }
 
+
     function delete_comment(commentId){
         $.ajax({
             type: "POST",
@@ -235,6 +248,7 @@ $(function(){
         success: function(data){
             console.log("success");
             console.log(data);
+            window.setTimeout(function(){window.location.reload()}, 1500);
         },
         failure: function(data){
             console.log("failure");
@@ -263,7 +277,6 @@ $(function(){
                 </div>
                 <input type="hidden" id="thread_text" name="variable" value="{{ thread.text }}">
                 <input type="hidden" id="thread_tags" name="variable" value="{{ thread.tags }}">
-                <input type="hidden" id="tag_function" name="variable" onload="createTagLinks()">
                 <p id="result"></p>
                 <p>{{ thread.date }}</p>
                 <br/>
@@ -273,12 +286,19 @@ $(function(){
                 {% for comment in commentsToThread %}
                     <div class="row">
                         <div class="col s1">
-                            <a href="{% url 'app:profile' id=comment.author.id%}">
-                                <img id="portraitMedium" src="{{ comment.author.image.url }}" >
-                            </a>
+                            {% if comment.author.user.username != "Anonymous" %}
+                                <a href="{% url 'app:profile' id=comment.author.id%}">
+                                    <img id="portraitMedium" src="{{ comment.author.image.url }}" >
+                                </a>
+                            {% endif %}
                         </div>
                         <div class="col s5">
-                            <a href="{% url 'app:profile' id=comment.author.id%}">{{ comment.author.user.username }}</a> wrote at
+                            {% if comment.author.user.username == "Anonymous" %}
+                                Anonymous
+                            {% else %}
+                                <a href="{% url 'app:profile' id=comment.author.id%}">{{ comment.author.user.username }}</a>
+                            {% endif %}
+                            wrote at
                             <p>{{ comment.comment_time }}</p>
                         </div>
                         <div class="col s1 offset-s5">
@@ -288,7 +308,6 @@ $(function(){
                             <a href="javascript:delete_comment('{{ comment.id }}')" style="color:#FF0000;" onclick="M.toast({html: 'Deleting comment!'})">Delete</a>
                         </div>
                     </div>
-
                         <p class="CommentL1" id="{{ comment.id }}text">{{ comment.text }}</p>
                             {% for innerComment in commentsToComment %}
                                 {% if innerComment.parentCommentID.id == comment.id %}
@@ -322,7 +341,6 @@ $(function(){
                 <h2>{{ thread.title }}</h2>
                 <input type="hidden" id="thread_text" name="variable" value="{{ thread.text }}">
                 <input type="hidden" id="thread_tags" name="variable" value="{{ thread.tags }}">
-                <input type="hidden" id="tag_function" name="variable" onload="createTagLinks()">
                 <p id="result"></p>
                 <p>{{ thread.date }}</p>
                 <br/>
@@ -332,12 +350,19 @@ $(function(){
                 {% for comment in commentsToThread %}
                     <div class="row">
                         <div class="col s1">
-                            <a href="{% url 'app:profile' id=comment.author.id%}">
-                                <img id="portraitMedium" src="{{ comment.author.image.url }}" >
-                            </a>
+                            {% if comment.author.user.username != "Anonymous" %}
+                                <a href="{% url 'app:profile' id=comment.author.id%}">
+                                    <img id="portraitMedium" src="{{ comment.author.image.url }}" >
+                                </a>
+                            {% endif %}
                         </div>
                         <div class="col s5">
-                            <a href="{% url 'app:profile' id=comment.author.id%}">{{ comment.author.user.username }}</a> wrote at
+                            {% if comment.author.user.username == "Anonymous" %}
+                                Anonymous
+                            {% else %}
+                                <a href="{% url 'app:profile' id=comment.author.id%}">{{ comment.author.user.username }}</a>
+                            {% endif %}
+                            wrote at
                             <p>{{ comment.comment_time }}</p>
                         </div>
                         {% if thisUser == comment.author.user %}
@@ -381,8 +406,5 @@ $(function(){
         {% endif %}
 
         </div>
-
-
-
     </div>
 {% endblock %}

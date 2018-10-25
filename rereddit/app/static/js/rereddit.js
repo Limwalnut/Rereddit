@@ -1,33 +1,25 @@
 function set_cookie(name,value)
 {
-    var Days = 1;
-    var exp = new Date();
-    exp.setTime(exp.getTime() + Days*24*60*60*1000);
-    document.cookie = name + "="+ escape (value) + ";expires=" + exp.toGMTString();
+    $.cookie(name ,value ,{path:'/'});
 }
 
 function get_cookie(name)
 {
-    var arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
-    if(arr=document.cookie.match(reg))
-        return unescape(arr[2]);
-    else
-        return null;
+    return $.cookie(name);
 }
 
 function del_cookie(name)
 {
-    var exp = new Date();
-    exp.setTime(exp.getTime() - 1);
-    var cval=getCookie(name);
-    if(cval!=null)
-        document.cookie= name + "="+cval+";expires="+exp.toGMTString();
+    $.cookie(name ,null);
 }
+
 
 $(document).ready(function(){
     $('#login-modal').modal({
         dismissible: false
     });
+    $('.modal').modal();
+    $('.sidenav').sidenav();
     $('.dropdown-trigger').dropdown({
         hover: true,
         inDuration: 300,
@@ -35,20 +27,7 @@ $(document).ready(function(){
         belowOrigin: true,
         alignment: 'right'
     });
-    var show_mode = get_cookie("show_mode");
-    var html_body = document.getElementById("body");
-
-    if(show_mode == "dark-mode"){
-        show_mode = "dark-mode";
-        html_body.className = show_mode;
-        $('#dark-switch input').attr("checked",true)
-
-    }else{
-        show_mode = "light-mode";
-        html_body.className = show_mode;
-        $('#dark-switch input').attr("checked",false)
-
-    }
+    check_dark_mode();
 });
 
 //open login modal
@@ -73,11 +52,32 @@ function on_login_submit(){
     }
 }
 
+function check_dark_mode(){
+    var show_mode = get_cookie("show_mode");
+    $('#body').removeAttr('class');
+
+    if(show_mode == null){}else{
+        if(show_mode == "dark-mode"){
+            $('#dark-switch input').attr("checked",true)
+        }else if(show_mode == "light-mode"){
+            $('#dark-switch input').attr("checked",false)
+        }
+        $('#body').addClass(show_mode)
+    }
+}
+
 function toggle_dark_mode() {
-    var html_body = document.getElementById("body");
-    var show_mode = get_cookie("show_mode") == "dark-mode" ? "light-mode" : "dark-mode";
-    html_body.className = show_mode;
-    set_cookie("show_mode", show_mode);
+    var show_mode = get_cookie("show_mode");
+    $('#body').removeAttr('class');
+
+    if(show_mode == "dark-mode"){
+        show_mode = "light-mode";
+
+    }else{
+        show_mode = "dark-mode";
+    }
+    $('#body').addClass(show_mode);
+    set_cookie("show_mode",show_mode);
 }
 
 function on_ginup_submit(){

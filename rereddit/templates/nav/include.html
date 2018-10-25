@@ -6,88 +6,21 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     {% load staticfiles %}
     <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'js/jquery.cookie.js' %}"></script>
     <script src="{% static 'js/jquery.validate.min.js' %}"></script>
     <script src="{% static 'js/materialize.js' %}"></script>
     <script src="{% static 'js/rereddit.js' %}"></script>
     <link rel="stylesheet" href="{% static 'css/rereddit.css' %}" />
     <link rel="stylesheet" href="{% static 'css/materialize.css' %}" />
-    <script>
-        $(document).ready(function(){
-            $('.modal').modal();
-        });
-        $(document).ready(function(){
-            $('.sidenav').sidenav();
-        });
-    </script>
-    <style>
-        .sidenav-trigger {
-            position: fixed;
-            bottom: 20%;
-            left: 0%;
-        }
-    </style>
 </head>
 <body id="body">
 {% block navbar %}
 {% endblock %}
-{% block content %}
+<div id="true-body">
+    {% block content %}
+    {% endblock %}
+</div>
+{% block footer %}
 {% endblock %}
-<a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons medium">list</i></a>
-
-<ul id="slide-out" class="sidenav">
-    <li><div class="user-view">
-      <div class="background">
-        <img src="\static\image\Parallax5.jpg" width="400">
-      </div>
-        {% if request.user.is_authenticated %}
-            <a href='{% url 'app:profile' id=user.id %}'><img  id="portraitBig" src="{{ user.profile.image.url }}"></a>
-        {% endif %}
-      <span class="white-text name">{{ user.username}}</span>
-      <span class="white-text email">{{ user.email}}</span>
-    </div></li>
-      {% if request.user.is_authenticated %}
-        <li><a class="waves-effect" href='{% url 'app:create' %}'><i class="material-icons">cloud</i>Create Thread</a></li>
-        <li><a class="waves-effect" href='{% url 'app:threads' %}'><i class="material-icons">cloud</i>Threads List</a></li>
-        <li><div class="divider"></div></li>
-{#        <li><a class="subheader">Subheader</a></li>#}
-        <li><a class="waves-effect" href='{% url 'app:logout' %}'>Logout</a></li>
-      {% else %}
-          <li><a class="waves-effect" href='{% url 'app:signup' %}'><i class="material-icons">account_circle</i>Signup</a></li>
-      {% endif %}
-
-  </ul>
-<!-- Modal Structure -->
-  <div id="modal1" class="modal">
-    <div class="modal-content">
-      <h4>About us</h4>
-      <h1>No contact details, sorry.</h1>
-    </div>
-    <div class="modal-footer">
-      <a href="#!" class="modal-close waves-effect waves-green btn-flat">Okay</a>
-    </div>
-  </div>
-
-    <footer class="page-footer">
-          <div class="container">
-            <div class="row">
-              <div class="col l6 s12">
-                <h5 class="white-text">Group member:</h5>
-                <p class="grey-text text-lighten-4">Ronald Noronha, Jason Zhang, Hanli Zhang, Zhong Shen, David Lo.</p>
-              </div>
-              <div class="col l4 offset-l2 s12">
-                <h5 class="white-text">Links</h5>
-                <ul>
-                  <li><a class="grey-text text-lighten-3 modal-trigger" href="#modal1">About</a></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div class="footer-copyright">
-            <div class="container">
-            © 2018 Re-reddit, Inc.
-            </div>
-          </div>
-        </footer>
-
 </body>
 </html>

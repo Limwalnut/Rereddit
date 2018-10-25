@@ -20,7 +20,7 @@
     </script>
 
     <div class="slider">
-    <ul class="slides">
+    <ul id="main-slider" class="slides">
       <li>
         <img src="/static/image/Parallax5.jpg"> <!-- random image -->
         <div class="caption center-align">
@@ -73,8 +73,9 @@
 
             <div class="col s3">
             <div class="card-panel red lighten-2">
+
                 {% if request.user.is_authenticated %}
-                    <h4 id="profile-text" >Subscribed Tags</h4>
+
                     {% for tag in tags %}
                         <div>
                             <hr/>
